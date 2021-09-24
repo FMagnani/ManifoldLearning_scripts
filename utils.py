@@ -19,8 +19,7 @@ import glob #COIL20
 import matplotlib.image as img
 
 # MNIST dataset
-
-class mnist_data():
+class mnist():
 
     def __init__(self):    
 
@@ -36,31 +35,21 @@ class mnist_data():
         plt.imshow(self.data_matrix[sample_number], cmap="gray")
 
 # COIL20 dataset
-
-class coil20_data():
+class coil20():
     
     def __init__(self):
         
-#        if (os.path.isfile("COIL20_vectorized.csv")):
-        if(False):
+        if (os.path.isfile("COIL20_vectorized.csv")):
             
-            pass
-          
-            # self.coil20_df = pd.read_csv("COIL20_vectorized.csv", index_col=0,
-            #                              dtype={"path":str, "vector":list})
-            # self.data_vector = np.array(self.coil20_df["vector"].values.tolist())
+            self.data = pd.read_csv("COIL20_vectorized.csv", index_col=0)
             
         else:
         
             self.coil20_path = "data/coil-20-proc/"
         
-            self.data = pd.DataFrame(columns=["object","view","path","vector"])
-
-            obj_list = []
-            view_list = []
-            path_list = []
-            vec_list = []
-            for im_path in glob.glob(self.coil20_path+"*.png")[:10]:
+            dict_list = []
+            
+            for im_path in glob.glob(self.coil20_path+"*.png"):
                 
                 # im_path is like 'data/coil-20-proc/obj9__41.png'
                 
@@ -70,24 +59,22 @@ class coil20_data():
                 im = np.array(imageio.imread(im_path)) # shape = (128,128)
                 im = im.reshape(128*128) # shape = (128*128,)
                 
-                obj_list.append(int(obj))
-                view_list.append(int(view))
-                path_list.append(im_path)
-                vec_list.append(im)
+                row = {"obj":int(obj), "view":int(view)}
+                for (value, index) in zip(im, range(len(im))):
+                    row[str(index)] = value
                 
-            self.data["object"] = obj_list
-            self.data["view"] = view_list
-            self.data["path"] = path_list
-            self.data["vector"] = vec_list
+                dict_list.append(row)
+                
+            self.data = pd.DataFrame(dict_list)
+            
+    def save_data(self):
+        
+        name = "COIL20_vectorized.csv"
+        self.data.to_csv(name, index=True)
 
     def show_sample(self, obj, view):
         
-        query1 = self.data["object"]==obj
-        index_list = self.data.index[query1].tolist()
-        query2 = self.data.loc[index_list]["view"]==view 
-        index = self.data.index[query2].tolist()[0]
-        
-        path = self.data.loc[index]["path"]
+        path = "data/coil-20-proc/obj"+str(obj)+"__"+str(view)+".png"
         
         im = img.imread(path)
         plt.imshow(im, cmap="gray")
