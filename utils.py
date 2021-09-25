@@ -23,13 +23,20 @@ class mnist():
 
     def __init__(self):    
 
-        self.mnist_path = "data/train-images.idx3-ubyte"
-        self.data_matrix = idx2numpy.convert_from_file(self.mnist_path)
+        self.train_path = "data/mnist/train-images.idx3-ubyte"
+        self.label_path = "data/mnist/train-labels.idx1-ubyte"
+         
+        # shape = (60000, 28, 28)
+        self.data_matrix = idx2numpy.convert_from_file(self.train_path)
         
         n_samples, dim1, dim2 = self.data_matrix.shape
         vector_dim = dim1*dim2
+        # shape = (60000, 784)
         self.data_vector = self.data_matrix.reshape(n_samples, vector_dim)
-
+        
+        self.data["labels"] = idx2numpy.convert_from_file(self.label_path)
+        self.data = pd.DataFrame(self.data_vector)
+        
     def show_sample(self, sample_number):
         
         plt.imshow(self.data_matrix[sample_number], cmap="gray")
@@ -47,25 +54,28 @@ class coil20():
         
             self.coil20_path = "data/coil-20-proc/"
         
-            dict_list = []
+            data_vector = []
             
-            for im_path in glob.glob(self.coil20_path+"*.png"):
+            for im_path in glob.glob(self.coil20_path+"*.png")[:10]:
                 
                 # im_path is like 'data/coil-20-proc/obj9__41.png'
                 
                 obj = im_path.split("obj")[1].split("__")[0]
                 view = im_path.split("obj")[1].split("__")[1].split('.')[0]
                 
+                obj = int(obj)
+                view = int(view)
+                
                 im = np.array(imageio.imread(im_path)) # shape = (128,128)
                 im = im.reshape(128*128) # shape = (128*128,)
+            
+                row = np.array([obj, view])
+                row = np.concatenate((row, im))
                 
-                row = {"obj":int(obj), "view":int(view)}
-                for (value, index) in zip(im, range(len(im))):
-                    row[str(index)] = value
+                data_vector.append(row)
                 
-                dict_list.append(row)
-                
-            self.data = pd.DataFrame(dict_list)
+            self.data = pd.DataFrame(data_vector) 
+            self.data.columns = np.concatenate( (["obj","view"], self.data.columns[:-2]) )
             
     def save_data(self):
         
