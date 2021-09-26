@@ -7,7 +7,7 @@ Created on Thu Sep 23 17:35:23 2021
 """
 
 # Utils
-# Read and plot raw data 
+# Read and plot data 
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,6 +21,17 @@ import matplotlib.image as img
 
 # MNIST dataset
 class mnist():
+    """
+    Class to load training and label set, plot individual samples.
+    
+    Useful members:
+        data: pandas DataFrame with label and vector components of the data point.
+                
+    Useful methods:    
+        show_sample:
+            pars: sample_number (int)
+            returns: none
+    """
 
     def __init__(self):    
 
@@ -45,9 +56,24 @@ class mnist():
 
 # COIL20 dataset
 class coil20():
+    """
+    Class to load coil20 dataset and show individual samples.
+    
+    Useful members:
+        data: pandas DataFrame with object number, view number, vector components.
+
+    Useful methods:
+        save_data:
+            pars: none, returns: none
+            Save the 'data' member in csv format (fixed name).
+        show_sample:
+            pars: obj (int), view (int)
+            returns: none 
+    """
     
     def __init__(self):
         
+        # Actually I don't know if it's faster than the other way.
         if (os.path.isfile("COIL20_vectorized.csv")):
             
             self.data = pd.read_csv("COIL20_vectorized.csv", index_col=0)
@@ -56,12 +82,11 @@ class coil20():
         
             self.coil20_path = "data/coil-20-proc/"
         
-            data_vector = []
+            row_list = []
             
             for im_path in glob.glob(self.coil20_path+"*.png")[:10]:
-                
+    
                 # im_path is like 'data/coil-20-proc/obj9__41.png'
-                
                 obj = im_path.split("obj")[1].split("__")[0]
                 view = im_path.split("obj")[1].split("__")[1].split('.')[0]
                 
@@ -74,9 +99,9 @@ class coil20():
                 row = np.array([obj, view])
                 row = np.concatenate((row, im))
                 
-                data_vector.append(row)
+                row_list.append(row)
                 
-            self.data = pd.DataFrame(data_vector) 
+            self.data = pd.DataFrame(row_list) 
             self.data.columns = np.concatenate( (["obj","view"], self.data.columns[:-2]) )
             
     def save_data(self):
@@ -94,6 +119,20 @@ class coil20():
 
 # Swiss roll dataset
 class swiss_roll():
+    """
+    Creates an istance of a swiss_roll dataset. 
+    Parameters: 
+        n_samples (int)
+        noise (float) - Gaussian noise applied to each point
+        seed (int) - Random seed to replicability
+    
+    Useful members:
+        data: 3 dimensional points of the dataset. np.array with shape (n_samples, 3)
+        t: The univariate position of the sample according to the main dimension of the points.
+
+    Useful methods:
+        plot
+    """
     
     def __init__(self, n_samples, noise, seed):
 
