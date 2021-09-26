@@ -18,6 +18,7 @@ import imageio #COIL20
 import glob #COIL20
 import matplotlib.image as img
 
+
 # MNIST dataset
 class mnist():
 
@@ -40,6 +41,7 @@ class mnist():
     def show_sample(self, sample_number):
         
         plt.imshow(self.data_matrix[sample_number], cmap="gray")
+
 
 # COIL20 dataset
 class coil20():
@@ -90,6 +92,47 @@ class coil20():
         plt.imshow(im, cmap="gray")
 
 
+# Swiss roll dataset
+class swiss_roll():
+    
+    def __init__(self, n_samples, noise, seed):
+
+        self.data, self.t = self.make_swiss_roll(n_samples, noise, seed)
+
+
+    def plot(self):
+        
+        fig = plt.figure()
+        ax = fig.add_subplot(projection = '3d')
+        
+        x = self.data[:,0]
+        y = self.data[:,1]
+        z = self.data[:,2]
+        
+        ax.scatter(x,y,z, c = self.t, cmap = 'viridis')
+
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_zlabel('z')
+        
+        plt.show()
+        
+    
+    def make_swiss_roll(self, n_samples, noise, seed):        
+
+        generator = np.random.RandomState(seed)        
+
+        t = 1.5 * np.pi * (1 + 2 * generator.rand(1, n_samples))
+        x = t * np.cos(t)
+        y = 21 * generator.rand(1, n_samples)
+        z = t * np.sin(t)
+
+        X = np.concatenate((x, y, z))
+        X += noise * generator.randn(3, n_samples)
+        X = X.T
+        t = np.squeeze(t)
+
+        return X, t
 
 
 
