@@ -16,11 +16,12 @@ import matplotlib.pyplot as plt
 
 class basic_LapEig():
     
-    def __init__(self, X, n_neighbors, n_components, t):
-        # self.X = X
-        # self.n_neighbors = n_neighbors
+    def __init__(self, X, labels, n_neighbors, n_components, t):
+        self.X = X
+        self.labels = labels
+        self.n_neighbors = n_neighbors
         self.n_components = n_components
-        # self.t = t
+        self.t = t
         
         # Data -> knn graph (sparse matrix)
         # knn graph is not symmetric.
@@ -66,12 +67,46 @@ class basic_LapEig():
             
             fig, ax = plt.subplots(1,1)
             
-            x = self.laplacian_embedding[:,0]
-            y = self.laplacian_embedding[:,1]
+            x = self.embedding[:,0]
+            y = self.embedding[:,1]
             
-            ax.scatter(x,y)
+            ax.set_title('Laplacian Eigenmap embedding')
+            ax.set_xlabel('First (nonzero) eigenvector')
+            ax.set_ylabel('Second eigenvector')
             
-                    
+            pars_legend = 'n_neighbors: '+str(self.n_neighbors)+\
+                            '\nt: '+str(self.t)   
+            ax.annotate(pars_legend, xy=(0.75,0.05),xycoords='axes fraction')
+            
+            ax.scatter(x,y, c=self.labels)
+            
+            plt.show()
+            
+            return ax
+            
+        #3D plot
+        if (dims==3):
+            
+            fig = plt.figure()
+            ax = fig.add_subplot(projection = '3d')
+        
+            x = self.embedding[:,0]
+            y = self.embedding[:,1]
+            z = self.embedding[:,2]
+        
+            title = 'Laplacian Eigenmap embedding\nknn: '+\
+                    str(self.n_neighbors)+', t: '+str(self.t)
+        
+            ax.set_title(title)
+            ax.set_xlabel('First eigenvector')
+            ax.set_ylabel('Second eigenvector')
+            ax.set_zlabel('Third eigenvector')
+            
+            ax.scatter(x,y,z, c = self.labels, cmap = 'viridis')        
+
+            plt.show()
+            
+            return ax
             
             
             
