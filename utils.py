@@ -25,8 +25,10 @@ class mnist():
     Class to load training and label set, plot individual samples.
     
     Useful members:
-        data: pandas DataFrame with label and vector components of the data point.
-                
+        dataframe: pandas DataFrame with label and vector components of the data point.
+        data: np.array of only vector components of each point
+        labels: np.array of the labels 
+        
     Useful methods:    
         show_sample:
             pars: sample_number (int)
@@ -44,11 +46,14 @@ class mnist():
         n_samples, dim1, dim2 = self.data_matrix.shape
         vector_dim = dim1*dim2
         # shape = (60000, 784)
-        self.data_vector = self.data_matrix.reshape(n_samples, vector_dim)
+        self.data = self.data_matrix.reshape(n_samples, vector_dim)
         
-        self.data = pd.DataFrame(self.data_vector)
-        self.data["labels"] = idx2numpy.convert_from_file(self.label_path)
-
+        self.labels = idx2numpy.convert_from_file(self.label_path)
+        
+        self.dataframe = pd.DataFrame(self.data)
+        self.dataframe["labels"] = self.labels
+        
+        
         
     def show_sample(self, sample_number):
         
