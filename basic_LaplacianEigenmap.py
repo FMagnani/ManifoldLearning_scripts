@@ -60,34 +60,25 @@ class basic_LapEig():
         return weighted_graph
 
 
-    def plot(self, dims=2):
+    def plot(self, ax, dims=2):
         
         # 2D plot
         if (dims==2):
             
-            fig, ax = plt.subplots(1,1)
-            
             x = self.embedding[:,0]
             y = self.embedding[:,1]
-            
-            ax.set_title('Laplacian Eigenmap embedding')
-            ax.set_xlabel('First (nonzero) eigenvector')
-            ax.set_ylabel('Second eigenvector')
-            
+                        
             pars_legend = 'n_neighbors: '+str(self.n_neighbors)+\
                             '\nt: '+str(self.t)   
             ax.annotate(pars_legend, xy=(0.75,0.05),xycoords='axes fraction')
             
             ax.scatter(x,y, c=self.labels)
             
-            plt.show()
-            
             return ax
             
         #3D plot
         if (dims==3):
             
-            fig = plt.figure()
             ax = fig.add_subplot(projection = '3d')
         
             x = self.embedding[:,0]
@@ -103,18 +94,72 @@ class basic_LapEig():
             ax.set_zlabel('Third eigenvector')
             
             ax.scatter(x,y,z, c = self.labels, cmap = 'viridis')        
-
-            plt.show()
             
             return ax
             
             
             
-            
-            
-            
-            
+#%%
 
+from utils import swiss_roll
+from time import time
+
+#%%
+
+# Time change
+
+fig, ax = plt.subplots(2,2)
+
+fig.suptitle("Laplacian Eigenmap embedding")
+
+data = swiss_roll(600, 0, 123456)
+
+times = [5, 33, 66, 100]
+ax_index = [(0,0),(0,1),(1,0),(1,1)]
+
+start = time()
+for (t,axis) in zip(times, ax_index):
+    
+    emb = basic_LapEig(data.data, data.t, 15, 2, t)
+    
+    i = axis[0]
+    j = axis[1]
+    ax[i,j] = emb.plot(ax[i,j], 2)
+
+stop = time()
+print("time to run: "+str(stop-start))
+
+fig.show()        
+
+
+#%%
+
+# N_Neighbors change
+
+fig, ax = plt.subplots(2,2)
+
+fig.suptitle("Laplacian Eigenmap embedding")
+
+data = swiss_roll(600, 0, 123456)
+
+knn = [5, 15, 20, 30]
+ax_index = [(0,0),(0,1),(1,0),(1,1)]
+
+start = time()
+for (knn,axis) in zip(knn, ax_index):
+    
+    emb = basic_LapEig(data.data, data.t, knn, 2, 30)
+    
+    i = axis[0]
+    j = axis[1]
+    ax[i,j] = emb.plot(ax[i,j], 2)
+
+stop = time()
+print("time to run: "+str(stop-start))
+
+fig.show()        
+
+#%%
 
 
 
