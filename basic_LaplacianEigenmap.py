@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 
 #%%
 
+# OK FOR SWISS ROLL
+# NOT YET READY FOR MNIST
 class basic_LapEig():
     
     def __init__(self, X, labels, n_neighbors, n_components, t):
@@ -160,6 +162,77 @@ print("time to run: "+str(stop-start))
 fig.show()        
 
 #%%
+
+# basic_LapEig VS sklearn.manifold.SpectralEmbedding
+
+from sklearn.manifold import SpectralEmbedding as SE
+
+# N_Neighbors change
+
+fig, ax = plt.subplots(3,2)
+
+fig.suptitle("My implementation VS sklearn implementation")
+
+data = swiss_roll(600, 0, 123456)
+
+knn = [5, 15, 25]
+ax_index_mine = [(0,0),(1,0),(2,0)]
+ax_index_skl = [(0,1),(1,1),(2,1)]
+
+start = time()
+
+for (n_neighbors,axis) in zip(knn, ax_index_mine):
+    
+    emb = basic_LapEig(data.data, data.t, n_neighbors, 2, 100)
+    
+    i = axis[0]
+    j = axis[1]
+    ax[i,j] = emb.plot(ax[i,j], 2)
+
+for (n_neighbors,axis) in zip(knn, ax_index_skl):
+    
+    emb = SE(n_components=2, n_neighbors=n_neighbors).fit_transform(data.data)
+    
+    i = axis[0]
+    j = axis[1]
+    
+    ax[i,j].scatter( emb[:,0], emb[:,1], c = data.t )
+    
+    pars_legend = 'n_neighbors: '+str(n_neighbors)+\
+                            '\nt: inf'   
+    ax[i,j].annotate(pars_legend, xy=(0.75,0.05),xycoords='axes fraction')
+           
+
+
+stop = time()
+print("time to run: "+str(stop-start))
+
+fig.show()        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
