@@ -23,17 +23,19 @@ class basic_LapEig():
         # self.t = t
         
         # Data -> knn graph (sparse matrix)
+        # knn graph is not symmetric.
         knn_graph = kneighbors_graph(X, n_neighbors, mode='distance',
                                      metric='euclidean')
-        
-        # knn graph -> Weighted (symm) graph
+                
+        # knn graph -> Weighted graph
         weighted_graph = self.compute_weights(knn_graph, t)
         
+        # Symmetrize weighted graph (sort of standard way to do this)
+        weighted_graph = (weighted_graph + weighted_graph.transpose())*.5
+        
         # Weighted graph -> Laplacian Embedding
-        self.laplacian_embedding = spectral_embedding(
-                                                 weighted_graph, 
-                                                 n_components=n_components
-                                                 )
+        self.embedding = spectral_embedding(weighted_graph, 
+                                            n_components=n_components)
         
     
     def compute_weights(self, knn_graph, t):
