@@ -46,8 +46,9 @@ class mnist():
         # shape = (60000, 784)
         self.data_vector = self.data_matrix.reshape(n_samples, vector_dim)
         
-        self.data["labels"] = idx2numpy.convert_from_file(self.label_path)
         self.data = pd.DataFrame(self.data_vector)
+        self.data["labels"] = idx2numpy.convert_from_file(self.label_path)
+
         
     def show_sample(self, sample_number):
         
