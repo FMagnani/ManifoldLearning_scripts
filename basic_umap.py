@@ -7,11 +7,9 @@ Created on Tue Sep 28 11:37:19 2021
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import euclidean_distances
 from sklearn.manifold import spectral_embedding
 
-#%%
 
 class basic_umap():
     """
@@ -158,25 +156,6 @@ class basic_umap():
         return ax
 
 
-
-#%%
-
-# SCRIPT
-
-from utils import swiss_roll
-
-data = swiss_roll(600, 0, 123456, 1)
-
-X = data.data
-labels = data.t
-
-emb = basic_umap(X, labels, 15, 2)
-
-fig, ax = plt.subplots(1,1)
-
-ax = emb.plot(ax)
-
-plt.show()
 
 
 
