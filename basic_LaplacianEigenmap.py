@@ -103,8 +103,14 @@ class basic_LapEig():
             
 #%%
 
+# SCRIPTS
+
 from utils import swiss_roll
 from time import time
+from sklearn.manifold import SpectralEmbedding as SE
+
+scale = 5
+data = swiss_roll(600, 0, 123456, scale)
 
 #%%
 
@@ -113,8 +119,6 @@ from time import time
 fig, ax = plt.subplots(2,2)
 
 fig.suptitle("Laplacian Eigenmap embedding")
-
-data = swiss_roll(600, 0, 123456)
 
 times = [5, 33, 66, 100]
 ax_index = [(0,0),(0,1),(1,0),(1,1)]
@@ -142,8 +146,6 @@ fig, ax = plt.subplots(2,2)
 
 fig.suptitle("Laplacian Eigenmap embedding")
 
-data = swiss_roll(600, 0, 123456)
-
 knn = [5, 15, 20, 30]
 ax_index = [(0,0),(0,1),(1,0),(1,1)]
 
@@ -165,25 +167,23 @@ fig.show()
 
 # basic_LapEig VS sklearn.manifold.SpectralEmbedding
 
-from sklearn.manifold import SpectralEmbedding as SE
-
 # N_Neighbors change
 
 fig, ax = plt.subplots(3,2)
 
 fig.suptitle("My implementation VS sklearn implementation")
 
-data = swiss_roll(600, 0, 123456)
-
 knn = [5, 15, 25]
 ax_index_mine = [(0,0),(1,0),(2,0)]
 ax_index_skl = [(0,1),(1,1),(2,1)]
+
+my_time = scale*scale*100
 
 start = time()
 
 for (n_neighbors,axis) in zip(knn, ax_index_mine):
     
-    emb = basic_LapEig(data.data, data.t, n_neighbors, 2, 100)
+    emb = basic_LapEig(data.data, data.t, n_neighbors, 2, 2500)
     
     i = axis[0]
     j = axis[1]
