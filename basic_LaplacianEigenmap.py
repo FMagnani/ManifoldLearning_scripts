@@ -30,13 +30,13 @@ class basic_LapEig():
                                      metric='euclidean')
                 
         # knn graph -> Weighted graph
-        weighted_graph = self.compute_weights(knn_graph, t)
+        self.weighted_graph = self.compute_weights(knn_graph, t)
         
         # Symmetrize weighted graph (sort of standard way to do this)
-        weighted_graph = (weighted_graph + weighted_graph.transpose())*.5
+        self.weighted_graph = (self.weighted_graph + self.weighted_graph.transpose())*.5
         
         # Weighted graph -> Laplacian Embedding
-        self.embedding = spectral_embedding(weighted_graph, 
+        self.embedding = spectral_embedding(self.weighted_graph, 
                                             n_components=n_components)
         
     
@@ -67,8 +67,10 @@ class basic_LapEig():
         y = self.embedding[:,1]
                         
         pars_legend = 'n_neighbors: '+str(self.n_neighbors)+\
-                        '\nt: '+str(self.t)   
-        ax.annotate(pars_legend, xy=(0.75,0.05),xycoords='axes fraction')
+                        ', t: '+str(self.t)   
+        ax.get_xaxis().set_ticks([])
+        ax.get_yaxis().set_ticks([])
+        ax.set_xlabel(pars_legend)
             
         ax.scatter(x,y, c=self.labels)
             
