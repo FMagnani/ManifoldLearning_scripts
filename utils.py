@@ -140,9 +140,9 @@ class swiss_roll():
         plot
     """
     
-    def __init__(self, n_samples, noise, seed, scale):
+    def __init__(self, n_samples, noise, seed, xscale=1, yscale=21, zscale=1):
 
-        self.data, self.t = self.make_swiss_roll(n_samples, noise, seed, scale)
+        self.data, self.t = self.make_swiss_roll(n_samples, noise, seed, xscale,yscale,zscale)
 
 
     def plot(self):
@@ -163,14 +163,14 @@ class swiss_roll():
         plt.show()
         
     
-    def make_swiss_roll(self, n_samples, noise, seed, scale):        
+    def make_swiss_roll(self, n_samples, noise, seed, xscale,yscale,zscale):        
 
         generator = np.random.RandomState(seed)        
 
         t = 1.5 * np.pi * (1 + 2 * generator.rand(1, n_samples))
-        x = scale*t * np.cos(t)
-        y = scale*21 * generator.rand(1, n_samples)
-        z = scale*t * np.sin(t)
+        x = xscale*t * np.cos(t)
+        y = yscale* generator.rand(1, n_samples)
+        z = zscale*t * np.sin(t)
 
         X = np.concatenate((x, y, z))
         X += noise * generator.randn(3, n_samples)

@@ -12,8 +12,8 @@ import umap.plot
 from basic_umap import basic_umap
 import matplotlib.pyplot as plt
 
-scale = 1
-data = swiss_roll(600, 0, 123456, scale)
+
+data = swiss_roll(600, 0, 123456)
 
 X = data.data
 labels = data.t

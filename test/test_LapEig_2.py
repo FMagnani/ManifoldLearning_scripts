@@ -13,8 +13,8 @@ from time import time
 from basic_LaplacianEigenmap import basic_LapEig
 from sklearn.manifold import SpectralEmbedding as SE
 
-scale = 1
-data = swiss_roll(600, 0, 123456, scale)
+
+data = swiss_roll(600, 0, 123456)
 
 X = data.data
 labels = data.t
@@ -39,7 +39,7 @@ knn = [5, 15, 25]
 ax_index_mine = [(0,0),(1,0),(2,0)]
 ax_index_skl = [(0,1),(1,1),(2,1)]
 
-my_time = scale*scale*100
+my_time = 100
 
 start = time()
 

@@ -11,8 +11,8 @@ import matplotlib.pyplot as plt
 from time import time
 from basic_LaplacianEigenmap import basic_LapEig
 
-scale = 1
-data = swiss_roll(600, 0, 123456, scale)
+
+data = swiss_roll(600, 0, 123456)
 
 X = data.data
 labels = data.t
