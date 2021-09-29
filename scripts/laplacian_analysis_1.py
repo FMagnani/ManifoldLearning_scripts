@@ -35,6 +35,12 @@ labels = data.t
 
 #%%
 
+"""
+The same function employed in 'basic_LapEig' class.
+From knn_neighbors matrix weighted by the distance, it returns the matrix
+weighted by Heat Kernel with time 't' in coo format.
+"""
+
 def compute_weights(knn_graph, t):
         
     inv_t = 1/t
@@ -59,15 +65,18 @@ def compute_weights(knn_graph, t):
 
 #%%
 
-n_neighbors = 15
+"""
+STEP 1: knn matrix weighted by distance
+Comparison between the sklearn implementation and the umap implementation:
+they're equivalent.
+INFO:
+  The point itself is the first nn for umap. For sklearn not by default, 
+                                              but the option is present.
+  The weight of not connected points is 0 for both the implementations.    
+"""
 
-# STEP 1: knn matrix weighted by distance
-# Comparison between the sklearn implementation and the umap implementation
-# They're equivalent
-# INFO:
-#   The point itself is the first nn for umap. For sklearn not by default, but the option is present.
-#   The weight of not connected points is 0 for both the implementations.    
-#
+
+n_neighbors = 15
 
 # Distance matrix + knn neighbors
 knn_graph = kneighbors_graph(X, n_neighbors, mode='distance',
@@ -102,6 +111,12 @@ plt.show()
 
 #%%
 
+"""
+From the knn-distances graph are computed: 
+    the heat kernel weighted graph.
+    the fuzzy topological graph.
+The distributions of their weights are compared.
+"""
 
 # STEP 2 - Dist_KNN matrix to weighted graph
 
@@ -126,7 +141,7 @@ heatker_weights_label = "Heat Kernel weights distribution (t=5)"
 fuztop_weights_label = "Fuzzy topological weights distribution"
 
 ax.hist(heatker_weights, bins=50, alpha=.8, color='b', label=heatker_weights_label)
-ax.hist(fuztop_weights[fuztop_weights<1], bins=50, alpha=.6, color='r', label=fuztop_weights_label)
+ax.hist(fuztop_weights, bins=50, alpha=.6, color='r', label=fuztop_weights_label)
 
 ax.legend()
 
@@ -135,7 +150,15 @@ plt.show()
 
 #%%
 
-# STEP 2 B - Heat Kernel weights distributions for various t
+"""
+Heat kernel weighted graph has a parameter 't'. For various t choices, the 
+resulting weights distribution is plotted.
+INFO:
+    Higher the 't' parameter, higer the resulting weights (pushed to 1).
+    Smaller the 't' parameter, smaller the resulting weights (pushed to 0).
+"""
+
+# Heat Kernel weights distributions for various t
 
 times = [5, 7, 20, 200]
 
@@ -156,80 +179,64 @@ ax.legend()
 
 plt.show()
 
-
 #%%
 
-# STEP 2 C - Heat Kernel weights distributions for various t and n_neighbors
+"""
+Fuzzy topological graph: symmetrization
+"""
 
-plt.style.use('seaborn')
+# Fuzzy topological graph
+fuztop_graph,_,_ = umap.umap_.fuzzy_simplicial_set(X, n_neighbors, 
+                                                        123456, 'euclidean')
+fuztop_weights = sparse.find(fuztop_graph)[2]
 
-times = [5, 25, 100]
-knn = [5, 10, 15]
+# Symmetrization average
+fuztop_graph_1 = (fuztop_graph + fuztop_graph.transpose())*.5
+fuztop_weights_1 = sparse.find(fuztop_graph_1)[2]
 
-n_rows = len(knn)
+# Symmetrization fuzzy union
+fuztop_graph_2 = fuztop_graph + fuztop_graph.transpose() + fuztop_graph.multiply(fuztop_graph)
+fuztop_weights_2 = sparse.find(fuztop_graph_2)[2]
 
-fig, ax = plt.subplots(n_rows,2, gridspec_kw={'width_ratios':[1,3]})
+fig, ax = plt.subplots(3,1)
 
-for row in range(n_rows):
-    
-    n_neighbors = knn[row]
-    
-    knn_graph = kneighbors_graph(X, n_neighbors, mode='distance',
-                                              metric='euclidean')
-    knn_dists = sparse.find(knn_graph)[2]    
-    
-    ax[row,0].set_ylabel("Neighbors: "+str(n_neighbors))
-    ax[row,0].hist(knn_dists, bins=50, color='black')
-    ax[row,0].annotate("Mean: "+str(knn_dists.mean())[:4],
-                       (0.6,0.8), xycoords='axes fraction')
-    
-    axis = ax[row,1]    
-    
-    for t in times:
-        
-        heatker_graph = compute_weights(knn_graph, t)
-        heatker_weights = sparse.find(heatker_graph)[2]
-
-        label = "t = "+str(t)+", mean: "+str(heatker_weights.mean())[:4]
-
-        axis.hist(heatker_weights, bins=50, alpha=.7, 
-                label=label)
-        axis.legend()
-
-        print(row, t)
-    
-
-ax[0,1].get_xaxis().set_ticks([])
-ax[1,1].get_xaxis().set_ticks([])
-
-for axis in ax[:,0][:-1]:
-    axis.get_xaxis().set_ticks([])
-    axis.get_yaxis().set_ticks([])
-ax[2,0].get_yaxis().set_ticks([])
-
-ax[0,1].set_title("Heat kernel weights distributions (various t)")
-ax[0,0].set_title("Distances distribution (knn applied)")
-#fig.suptitle("Heat kernel weights distributions for various t")
-
+ax[0].hist(fuztop_weights, bins=50)
+ax[1].hist(fuztop_weights_1, bins=50)
+ax[2].hist(fuztop_weights_2, bins=50)
 
 plt.show()
 
 
+#%%
+
+"""
+Heat kernel graph: symmetrization
+"""
+
+# Heat kernel, a couple of t
+
+# t=5
+hk_1 = compute_weights(knn_graph, 5)
+hk_w_1 = sparse.find(hk_1)[2]
+# symmetrized
+hk_symm_1 = (hk_1 + hk_1.transpose())*.5
+hk_w_symm_1 = sparse.find(hk_symm_1)[2]
+
+# t=100
+hk_2 = compute_weights(knn_graph, 100)
+hk_w_2 = sparse.find(hk_2)[2]
+# symmetrized
+hk_symm_2 = (hk_2 + hk_2.transpose())*.5
+hk_w_symm_2 = sparse.find(hk_symm_2)[2]
 
 
+# plot
+fig, ax = plt.subplots(2,1)
 
+ax[0].hist(hk_w_1, bins=50, color='b', alpha=.8)
+ax[0].hist(hk_w_2, bins=50, color='r', alpha=.8)
+ax[1].hist(hk_w_symm_1, bins=50, color='b', alpha=.8)
+ax[1].hist(hk_w_symm_2, bins=50, color='r', alpha=.8)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+plt.show()
 
