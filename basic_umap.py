@@ -18,6 +18,9 @@ class basic_umap():
     The weighted graph of the probabilities is computed and then embedded
     in low dimensions through Laplacian Eigenmap.
     
+    Reference:
+        https://towardsdatascience.com/how-to-program-umap-from-scratch-e6eff67f55fe
+    
     Pars:
         X: high dimensional data, shape (n_samples, n_features)
         labels: true labeling of the data, shape (n_samples)
