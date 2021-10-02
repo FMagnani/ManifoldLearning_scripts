@@ -90,7 +90,7 @@ class coil20():
         
             row_list = []
             
-            for im_path in glob.glob(self.coil20_path+"*.png")[:10]:
+            for im_path in glob.glob(self.coil20_path+"*.png"):
     
                 # im_path is like 'data/coil-20-proc/obj9__41.png'
                 obj = im_path.split("obj")[1].split("__")[0]
