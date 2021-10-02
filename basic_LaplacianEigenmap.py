@@ -7,10 +7,48 @@ Created on Mon Sep 27 13:00:09 2021
 """
 
 from sklearn.neighbors import kneighbors_graph
+from umap.umap_ import nearest_neighbors
 import scipy.sparse as sparse
 import numpy as np
 from sklearn.manifold import spectral_embedding
 import matplotlib.pyplot as plt
+
+def heatKernel_graph(X, n_neighbors, t, seed=123456):
+    """
+    Computes the heat kernel weighted graph, gicen parameters 'n_neighbors'
+    and 't'. Returns the sparse adjacency matrix in csr format.
+    PARS:
+        X: numpy array of shape (n_samples, n_features)
+        n_neighbors: int
+        t: scalar - be careful since it depends on the distances distributions
+    """
+    
+    n_samples = X.shape[0]
+    
+    # KNN distance-weighted graph
+    knn_ind, knn_vals, _ = nearest_neighbors(X, n_neighbors, 
+                                             metric='euclidean',
+                                             metric_kwds = {}, 
+                                             angular=False,
+                                             random_state=seed)
+    
+    # Getting the arrays to initialize sparse matrix in coordinate format
+    coo_vals = knn_vals.reshape(n_samples*n_neighbors)
+    coo_i = []
+    for k in range(n_samples):
+        coo_i.append( n_neighbors*[k] )   
+    coo_i = np.array(coo_i).reshape(n_samples*n_neighbors)
+    coo_j = knn_ind.reshape(n_samples*n_neighbors)
+    
+    # knn graph as a COO sparse matrix
+    knn_graph = sparse.coo_matrix((coo_vals, (coo_i, coo_j)))
+   
+    # heat kernel graph
+    heatker_graph = compute_heatker_weights(knn_graph, t)
+    
+    return heatker_graph
+
+    
 
 def compute_heatker_weights(knn_graph, t):
     """
