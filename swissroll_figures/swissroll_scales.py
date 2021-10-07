@@ -11,7 +11,16 @@ from utils import swiss_roll
 from sklearn.manifold import SpectralEmbedding
 import matplotlib.pyplot as plt
 
+from umap.umap_ import fuzzy_simplicial_set
+from umap.spectral import spectral_layout
+
 #%%
+"""
+The swiss roll dataset is created giving to one of the axis a much greater 
+scale. Due to the symmetry of its shape, actually this makes a difference
+if it's done to the y axis (along the width of the roll) on one hand, or to
+either the x or z axis on the other hand. 
+"""
 
 dataset_x = swiss_roll(2000, 0, 123, 10,10,1)
 dataset_z = swiss_roll(2000, 0, 123, 1,10,10)
@@ -26,6 +35,9 @@ z = dataset_z.data
 labels_z = dataset_z.t
 
 #%%
+"""
+Embedding by Laplacian Eigenmap for 10 n_neighbors.
+"""
 
 model = SpectralEmbedding(n_components=2, n_neighbors=10)
 
@@ -51,6 +63,52 @@ ax[1].get_yaxis().set_ticks([])
 
 fig.show()
 
+#%%
+"""
+Embedding by UMAP for some values of n_neighbors.
+"""
+
+n_neighbors_list = [5, 10, 15]
+
+fig, axes = plt.subplots(1,3)
+
+for j in [0,1,2]:
+    
+    n_neighbors = n_neighbors_list[j]
+    ax = axes[j]
+
+    fuztop_graph, _, _, _ = fuzzy_simplicial_set(
+                                                 x,
+                                                 n_neighbors = n_neighbors,
+                                                 random_state = 123456,
+                                                 metric = 'euclidean',
+                                                 metric_kwds={},
+                                                 knn_indices=None,
+                                                 knn_dists=None,
+                                                 angular=False,
+                                                 set_op_mix_ratio=1.0,
+                                                 local_connectivity=1.0,
+                                                 apply_set_operations=True,
+                                                 verbose=False,
+                                                 return_dists=False,
+                                                 )
+
+    fuztop_embedding = spectral_layout(x, fuztop_graph, dim=2,
+                                       random_state=123456, 
+                                       metric='euclidean', metric_kwds={})
+
+
+    ax.scatter(fuztop_embedding[:,0], fuztop_embedding[:,1], c=labels_x)
+
+    ax.set_title("N_neighbors: "+str(n_neighbors))
+    ax.get_xaxis().set_ticks([])
+    ax.get_yaxis().set_ticks([])
+
+
+note = "Scales\nx: [-100,100]\ny: [0,10]\nz: [-10,15]"
+axes[1].annotate(note_x, (0.1,0.8), xycoords = 'axes fraction', fontsize=13)
+
+fig.show()
 
 
 
