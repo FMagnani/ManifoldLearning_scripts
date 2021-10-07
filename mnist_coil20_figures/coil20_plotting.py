@@ -41,7 +41,7 @@ n_neighbors_list = [5,15,50,200]
 for (i, metric) in [ (0,'euclidean'), (1,'cosine') ]:
     # Columns
     for j in range(4):
-        n_neighbors = n_neighbors_list[i]
+        n_neighbors = n_neighbors_list[j]
         
         ax[0,j].set_xlabel("N_neighbors = "+str(n_neighbors))        
         
@@ -77,7 +77,7 @@ n_neighbors_list = [5,15,50,200]
 for (i, metric) in [ (0,'euclidean'), (1,'cosine') ]:
     # Columns
     for j in range(4):
-        n_neighbors = n_neighbors_list[i]
+        n_neighbors = n_neighbors_list[j]
         
         ax[0,j].set_xlabel("N_neighbors = "+str(n_neighbors))        
         
