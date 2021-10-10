@@ -17,6 +17,7 @@ import idx2numpy # MNIST
 import imageio #COIL20
 import glob #COIL20
 import matplotlib.image as img
+import scipy.sparse as sparse
 
 
 # MNIST dataset
@@ -178,6 +179,43 @@ class swiss_roll():
         t = np.squeeze(t)
 
         return X, t
+
+
+    
+def compute_heatker_weights(knn_graph, t):
+    """
+    Given a neighbors graph (eventually weighted by the distance), the 
+    graph weighted by the heat kernel at time 't' is returned.
+    
+    PARS:
+        knn_graph: Should be one of the classes of scipy.sparse
+        t: time parameter for the heat kernel
+    RETURNS:
+        weighted_graph: The weighted graph, symmetrized by average,
+                        in csr format.
+    """
+        
+    inv_t = 1/t
+        
+    knn_graph = knn_graph.tocsr()
+        
+    rows = knn_graph.nonzero()[0]
+    cols = knn_graph.nonzero()[1]
+        
+    entries = []
+        
+    for i in range(len(rows)):
+            
+        dist = knn_graph[ rows[i], cols[i] ]
+        weight = np.exp( -inv_t*np.power(dist, 2) )
+        entries.append(weight)
+            
+    weighted_graph = sparse.coo_matrix((entries, (rows, cols)))
+    weighted_graph = weighted_graph.tocsr()
+        
+    weighted_graph = (weighted_graph + weighted_graph.transpose())*0.5
+        
+    return weighted_graph
 
 
 
