@@ -6,8 +6,7 @@ Created on Thu Sep 30 19:20:23 2021
 @author: fede
 """
 
-from utils import swiss_roll
-from basic_LaplacianEigenmap import basic_LapEig, compute_heatker_weights
+from utils import swiss_roll, compute_heatker_weights
 import matplotlib.pyplot as plt
 import umap
 import scipy.sparse as sparse
